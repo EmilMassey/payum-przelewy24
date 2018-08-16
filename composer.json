@@ -1,0 +1,31 @@
+{
+    "name": "EmilMassey/payum-przelewy24",
+    "type": "library",
+    "description": "Przelewy24 gateway for Payum",
+    "keywords": ["payment", "payum", "przelewy24"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Emil Masiakowski",
+            "email": "emil.masiakowski@gmail.com"
+        }
+    ],
+    "require": {
+        "payum/core": "^1.5"
+    },
+    "require-dev": {
+        "payum/core": "^1.5@dev",
+        "php-http/guzzle6-adapter": "^1.0"
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {
+        "psr-4": { "EmilMassey\\Payum\\Przelewy24\\": "src/" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.5-dev"
+        }
+    }
+}
