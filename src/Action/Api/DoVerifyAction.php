@@ -1,8 +1,7 @@
 <?php
 
-namespace src\Action\Api;
+namespace EmilMassey\Payum\Przelewy24\Action\Api;
 
-use EmilMassey\Payum\Przelewy24\Action\Api\BaseApiAwareAction;
 use EmilMassey\Payum\Przelewy24\Constants;
 use EmilMassey\Payum\Przelewy24\Request\Api\DoVerify;
 use EmilMassey\Payum\Przelewy24\SumGenerator;
@@ -31,20 +30,24 @@ class DoVerifyAction extends BaseApiAwareAction
             throw new HttpResponse('Bad request', 400);
         }
 
-        $model->validateNotEmpty(['p24_session_id', 'p24_amount', 'p24_currency', 'p24_order_id']);
+        $model->validateNotEmpty(['payment_id', 'amount', 'currency', 'order_id']);
+        $model['order_id'] = $httpRequest->request['p24_order_id'];
 
         $sumGenerator = new SumGenerator(Constants::ACTION_VERIFY, $this->api->getOptions());
 
         try {
-            $this->api->doVerify([
+            $fields = [
                 'p24_merchant_id' => $this->api->getOptions()['merchant_id'],
                 'p24_pos_id' => $this->api->getOptions()['pos_id'],
-                'p24_session_id' => $model['p24_session_id'],
-                'p24_amount' => $model['p24_amount'],
-                'p24_currency' => $model['p24_currency'],
-                'p24_order_id' => $model['p24_order_id'],
-                'p24_sign' => $sumGenerator->generate((array)$model),
-            ]);
+                'p24_session_id' => $model['payment_id'],
+                'p24_amount' => $model['amount'],
+                'p24_currency' => $model['currency'],
+                'p24_order_id' => $model['order_id'],
+            ];
+
+            $fields['p24_sign'] = $sumGenerator->generate($fields);
+
+            $this->api->doVerify($fields);
         } catch (RuntimeException $e) {
             $model['status'] = Constants::STATUS_FAILED;
             $request->setModel($model);

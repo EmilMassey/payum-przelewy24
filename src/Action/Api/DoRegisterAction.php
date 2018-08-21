@@ -5,26 +5,25 @@ namespace EmilMassey\Payum\Przelewy24\Action\Api;
 use EmilMassey\Payum\Przelewy24\Constants;
 use EmilMassey\Payum\Przelewy24\Request\Api\DoRegister;
 use EmilMassey\Payum\Przelewy24\SumGenerator;
+use League\Uri\Http as HttpUri;
+use League\Uri\Modifiers\MergeQuery;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\InvalidArgumentException;
 use Payum\Core\Exception\RequestNotSupportedException;
-use Payum\Core\Request\GetHttpRequest;
+use Payum\Core\Reply\HttpRedirect;
 use Payum\Core\Security\GenericTokenFactory;
 use Payum\Core\Security\GenericTokenFactoryAwareInterface;
-use Payum\Core\Security\GenericTokenFactoryInterface;
+use Payum\Core\Security\GenericTokenFactoryAwareTrait;
 use Payum\Core\Security\TokenInterface;
 
 class DoRegisterAction extends BaseApiAwareAction implements GenericTokenFactoryAwareInterface
 {
+    use GenericTokenFactoryAwareTrait;
+
     /**
      * @var GenericTokenFactory
      */
     protected $tokenFactory;
-
-    public function setGenericTokenFactory(GenericTokenFactoryInterface $genericTokenFactory = null)
-    {
-        $this->tokenFactory = $genericTokenFactory;
-    }
 
     /**
      * @param DoRegister $request
@@ -37,7 +36,7 @@ class DoRegisterAction extends BaseApiAwareAction implements GenericTokenFactory
 
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
-        $model->validateNotEmpty(['email', 'amount', 'description', 'currency', /*'firstname', 'lastname',*/ 'payment_id']);
+        $model->validateNotEmpty(['email', 'amount', 'description', 'currency', 'payment_id']);
 
         if (!in_array($model['currency'], Constants::ALLOWED_CURRENCIES)) {
             throw new InvalidArgumentException('Invalid currency');
@@ -59,7 +58,7 @@ class DoRegisterAction extends BaseApiAwareAction implements GenericTokenFactory
         $model['status'] = Constants::STATUS_PENDING;
         $request->setModel($model);
 
-        $request->getToken()->setTargetUrl($reply->getUrl());
+        throw new HttpRedirect($reply->getUrl());
     }
 
     public function supports($request)
@@ -74,13 +73,20 @@ class DoRegisterAction extends BaseApiAwareAction implements GenericTokenFactory
             $token->getGatewayName(),
             $token->getDetails()
         )->getTargetUrl();
-        $order['p24_url_cancel'] = $token->getTargetUrl() . '&cancelled=1';
+
+        $cancelUri = HttpUri::createFromString($token->getTargetUrl());
+        $modifier = new MergeQuery('cancelled=1');
+        $cancelUri = (string) $modifier->process($cancelUri);
+        $order['p24_url_cancel'] = $cancelUri;
     }
 
     private function setOrderClientData(ArrayObject $model, array &$order): void
     {
         $order['p24_email'] = $model['email'];
-        //$order['p24_client'] = $model['firstname'] . ' ' . $model['lastname'];
+
+        if (isset($model['firstname']) || isset($model['lastname'])) {
+            $order['p24_client'] = trim($model['firstname'] . ' ' . $model['lastname']);
+        }
 
         if (isset($model['address'])) {
             $order['p24_address'] = $model['address'];

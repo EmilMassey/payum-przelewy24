@@ -2,10 +2,10 @@
 
 namespace EmilMassey\Payum\Przelewy24;
 
-use EmilMassey\Payum\Przelewy24\Action\Api\DoCancelAction;
-use EmilMassey\Payum\Przelewy24\Action\CancelAction;
+use EmilMassey\Payum\Przelewy24\Action\Api\DoVerifyAction;
 use EmilMassey\Payum\Przelewy24\Action\ConvertPaymentAction;
 use EmilMassey\Payum\Przelewy24\Action\CaptureAction;
+use EmilMassey\Payum\Przelewy24\Action\NotifyAction;
 use EmilMassey\Payum\Przelewy24\Action\StatusAction;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\GatewayFactory;
@@ -23,9 +23,10 @@ class Przelewy24GatewayFactory extends GatewayFactory
             'payum.factory_title' => 'Przelewy24',
             'payum.action.capture' => new CaptureAction(),
             'payum.action.status' => new StatusAction(),
-            //'payum.action.notify' => new NotifyAction(),
+            'payum.action.notify' => new NotifyAction(),
             'payum.action.convert_payment' => new ConvertPaymentAction(),
             'payum.action.api.do_register' => new DoRegisterAction(),
+            'payum.action.api.do_verify' => new DoVerifyAction(),
         ]);
 
         if (false == $config['payum.api']) {
