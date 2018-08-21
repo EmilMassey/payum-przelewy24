@@ -1,5 +1,5 @@
 {
-    "name": "EmilMassey/payum-przelewy24",
+    "name": "emil-massey/payum-przelewy24",
     "type": "library",
     "description": "Przelewy24 gateway for Payum",
     "keywords": ["payment", "payum", "przelewy24"],
