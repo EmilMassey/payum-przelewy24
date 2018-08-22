@@ -30,7 +30,7 @@ class DoVerifyAction extends BaseApiAwareAction
             throw new HttpResponse('Bad request', 400);
         }
 
-        $model->validateNotEmpty(['payment_id', 'amount', 'currency', 'order_id']);
+        $model->validateNotEmpty(['payment_id', 'amount', 'currency']);
         $model['order_id'] = $httpRequest->request['p24_order_id'];
 
         $sumGenerator = new SumGenerator(Constants::ACTION_VERIFY, $this->api->getOptions());
