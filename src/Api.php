@@ -49,6 +49,10 @@ class Api
     {
         $response = $this->doRequest('POST', Constants::ACTION_REGISTER, $order);
 
+        if (!isset($response['token'])) {
+            throw new \RuntimeException('Token undefined');
+        }
+
         return new HttpRedirect($this->getApiEndpoint() . Constants::ACTION_REDIRECT . '/' . $response['token']);
     }
 
@@ -80,7 +84,7 @@ class Api
 
         array_map('urldecode', $response);
 
-        if (!isset($response['error']) || 0 != $response['error'] || !isset($response['token'])) {
+        if (!isset($response['error']) || 0 != $response['error']) {
             $errorMessage = isset($response['error']) ? $response['error'] . ': ' : '';
             $errorMessage .= isset($response['errorMessage']) ? $response['errorMessage'] : 'Unknown error';
 
