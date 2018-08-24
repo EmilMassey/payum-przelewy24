@@ -116,6 +116,7 @@ class DoRegisterAction extends BaseApiAwareAction implements GenericTokenFactory
         $order['p24_currency'] = $model['currency'];
         $order['p24_country'] = 'PL';
         $order['p24_api_version'] = Constants::API_VERSION;
+        $order['p24_encoding'] = 'UTF-8';
 
         if (isset($model['channel'])) {
             $order['p24_channel'] = $model['channel'];
