@@ -21,4 +21,10 @@ final class Constants
     const STATUS_FAILED = 'failed';
     const STATUS_CANCELED = 'canceled';
     const STATUS_EXPIRED = 'expired';
+
+    const CHANNEL_CARD = 1;
+    const CHANNEL_TRANSFER = 2;
+    const CHANNEL_TRANSFER_TRADITIONAL = 4;
+    const CHANNEL_24_7 = 16;
+    const CHANNEL_PREPAID = 32;
 }
